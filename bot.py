@@ -3,6 +3,7 @@ import logging
 import ephem
 import settings
 import string
+import re
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                     level=logging.INFO,
@@ -71,15 +72,48 @@ def count_words(bot, update):
     words = str(len(phrase.split())) + ' кло-во слов во фразе'
     update.message.reply_text(words)
 
+def call_calculate(bot, update):
+     text = 'Напишите уравнение, заканчивающееся знаком ='
+     update.message.reply_text(text)
+     equation = update.message.text
+     try:
+         numbers = re.split(r'[+-/\*]', equation)
+         sign = re.findall(r'[\+-/\*]', equation)
+         for numb in range(len(numbers)):
+             result = int(numbers[numb])
+             numb += 1
+             if '+' in sign:
+                 result += int(numbers[numb])
+                 break
+             elif '-' in sign:
+                 result -= int(numbers[numb])
+                 break
+             elif '/' in sign:
+                 result = result / int(numbers[numb])
+                 break
+             elif '*' in sign:
+                 result *= int(numbers[numb])
+                 break
+     except ZeroDivisionError:
+         print('Деление на 0!!!')
+     except (SyntaxError, ValueError):
+         print('Введите числа')
+     else:
+         update.message.reply_text(result)
+
+
+
 def main():
     mybot = Updater(settings.TELEGRAM_API_KEY, request_kwargs=PROXY)
     dp = mybot.dispatcher
     dp.add_handler(CommandHandler("start", greet_user))
     dp.add_handler(CommandHandler("planet", start_planet))
     dp.add_handler(CommandHandler("wordcount", print_word))
-    dp.add_handler(MessageHandler(Filters.text, count_words))
-    dp.add_handler(MessageHandler(Filters.text, talk_to_me))
-    dp.add_handler(MessageHandler(Filters.text, where_planet))
+    dp.add_handler(CommandHandler("calculate", call_calculate))
+    # dp.add_handler(MessageHandler(Filters.text, call_calculate))
+    # dp.add_handler(MessageHandler(Filters.text, how_match))
+    # dp.add_handler(MessageHandler(Filters.text, where_planet))
+    # dp.add_handler(MessageHandler(Filters.text, talk_to_me))
 
     mybot.start_polling()
     mybot.idle()
