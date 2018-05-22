@@ -17,18 +17,15 @@ def greet_user(bot, update):
     print(text)
     update.message.reply_text(text)
 
-
 def talk_to_me(bot, update):
     user_text = update.message.text
     print(user_text)
     update.message.reply_text('меня нет')
 
-
 def start_planet(bot, update):
     text = 'Напечатайте планету на английском'
     print(text)
     update.message.reply_text(text)
-
 
 def where_planet(bot, update):
     planet_text = update.message.text
@@ -111,9 +108,9 @@ def main():
     dp.add_handler(CommandHandler("wordcount", print_word))
     dp.add_handler(CommandHandler("calculate", call_calculate))
     # dp.add_handler(MessageHandler(Filters.text, call_calculate))
-    # dp.add_handler(MessageHandler(Filters.text, how_match))
+    # dp.add_handler(MessageHandler(Filters.text, count_words))
     # dp.add_handler(MessageHandler(Filters.text, where_planet))
-    # dp.add_handler(MessageHandler(Filters.text, talk_to_me))
+    dp.add_handler(MessageHandler(Filters.text, talk_to_me))
 
     mybot.start_polling()
     mybot.idle()
