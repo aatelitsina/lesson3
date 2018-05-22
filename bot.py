@@ -1,4 +1,6 @@
+from calculate import calculate
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
+import telegram
 import logging
 import ephem
 import settings
@@ -10,7 +12,7 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
                     filename='bot.log'
                     )
 
-PROXY = {'proxy_url': 'socks5://u0k12.tgproxy.me:1080', 'urllib3_proxy_kwargs': {'username': 'telegram', 'password': 'telegram'}}
+PROXY = {'proxy_url': 'socks5://t1.learn.python.ru:1080', 'urllib3_proxy_kwargs': {'username': 'learn', 'password': 'python'}}
 
 def greet_user(bot, update):
     text = 'Вызван /start'
@@ -24,7 +26,6 @@ def talk_to_me(bot, update):
 
 def start_planet(bot, update):
     text = 'Напечатайте планету на английском'
-    print(text)
     update.message.reply_text(text)
 
 def where_planet(bot, update):
@@ -69,10 +70,24 @@ def count_words(bot, update):
     words = str(len(phrase.split())) + ' кло-во слов во фразе'
     update.message.reply_text(words)
 
+
+q_equation = ""
+
+
 def call_calculate(bot, update):
-     text = 'Напишите уравнение, заканчивающееся знаком ='
-     update.message.reply_text(text)
-     equation = update.message.text
+     #text = 'Напишите уравнение, заканчивающееся знаком ='
+     #update.message.reply_text(text)
+     equation = update.message.text.replace('/calculate','').strip()
+     if equation == "":
+         q_equation = ""
+         custom_keyboard = [['7', '8', '9', '*'],
+                            ['4', '5', '6', '-'],
+                            ['1', '2', '3', '+'],
+                            [',', '0', '=', '/']]
+         reply_markup = telegram.ReplyKeyboardMarkup(custom_keyboard)
+         bot.send_message(chat_id=update.message.chat_id, text = "Калькулятор", reply_markup = reply_markup)
+         return
+
      try:
          numbers = re.split(r'[+-/\*]', equation)
          sign = re.findall(r'[\+-/\*]', equation)
@@ -98,6 +113,13 @@ def call_calculate(bot, update):
      else:
          update.message.reply_text(result)
 
+def auto_calculate(bot,update):
+    global q_equation
+    if update.message.text != '=':
+        q_equation =  q_equation + update.message.text
+    else:
+        reply_markup = telegram.ReplyKeyboardRemove()
+        bot.send_message(chat_id=update.message.chat_id, text=calculate(q_equation), reply_markup=reply_markup)
 
 
 def main():
@@ -107,10 +129,10 @@ def main():
     dp.add_handler(CommandHandler("planet", start_planet))
     dp.add_handler(CommandHandler("wordcount", print_word))
     dp.add_handler(CommandHandler("calculate", call_calculate))
-    # dp.add_handler(MessageHandler(Filters.text, call_calculate))
+    dp.add_handler(MessageHandler(Filters.text, auto_calculate))
     # dp.add_handler(MessageHandler(Filters.text, count_words))
     # dp.add_handler(MessageHandler(Filters.text, where_planet))
-    dp.add_handler(MessageHandler(Filters.text, talk_to_me))
+    # dp.add_handler(MessageHandler(Filters.text, talk_to_me))
 
     mybot.start_polling()
     mybot.idle()
