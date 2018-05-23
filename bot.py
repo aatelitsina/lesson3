@@ -28,35 +28,28 @@ def start_planet(bot, update):
     text = 'Напечатайте планету на английском'
     update.message.reply_text(text)
 
+planets = {
+  'Mercury':ephem.Mercury(),
+  'Venus':ephem.Venus(),
+  'Mars':ephem.Mars(),
+  'Jupiter':ephem.Jupiter(),
+  'Saturn':ephem.Saturn(),
+  'Uranus': ephem.Uranus(),
+  'Neptune': ephem.Neptune(),
+  'Pluto': ephem.Pluto(),
+  'Sun': ephem.Sun(),
+  'Moon': ephem.Moon(),
+}
+    
 def where_planet(bot, update):
-    planet_text = update.message.text
-    print(planet_text)
-    if planet_text == 'Mercury':
-        planet = ephem.Mercury()
-    elif planet_text == 'Venus':
-        planet = ephem.Venus()
-    elif planet_text == 'Mars':
-        planet = ephem.Mars()
-    elif planet_text == 'Jupiter':
-        planet = ephem.Jupiter()
-    elif planet_text == 'Saturn':
-        planet = ephem.Saturn()
-    elif planet_text == 'Uranus':
-        planet = ephem.Uranus()
-    elif planet_text == 'Neptune':
-        planet = ephem.Neptune()
-    elif planet_text == 'Pluto':
-        planet = ephem.Pluto()
-    elif planet_text == 'Sun':
-        planet = ephem.Sun()
-    elif planet_text == 'Moon':
-        planet = ephem.Moon()
-    else:
+    planet = update.message.text
+    print(planet)
+    if planet not in planets.keys():
         update.message.reply_text('Я не знаю такой планеты')
         return
-
-    planet.compute()
-    update.message.reply_text(ephem.constellation(planet))
+    else:
+      planets[planet].compute()
+      update.message.reply_text(ephem.constellation(planets[planet]))
 
 def print_word(bot, update):
     text = 'Напечатайте фразу'
