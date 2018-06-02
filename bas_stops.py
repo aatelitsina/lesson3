@@ -1,3 +1,5 @@
+# Считать из csv-файла (с http://data.mos.ru/datasets/752) количество остановок, вывести улицу, на которой больше всего остановок
+
 import csv
 count_stops = 0
 count_distinct_stop = 0
